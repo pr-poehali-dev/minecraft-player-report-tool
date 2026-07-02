@@ -616,10 +616,10 @@ export default function Index() {
   ════════════════════════════════════ */
   function Stats() {
     const bars = [
-      { emoji: '💣', l: 'Гриферство',  v: 42, c: 'hsl(var(--mc-grass))'    },
-      { emoji: '⚡', l: 'Читы',         v: 31, c: 'hsl(var(--mc-diamond))'  },
-      { emoji: '💬', l: 'Оскорбления', v: 18, c: 'hsl(var(--mc-gold))'     },
-      { emoji: '🗝️', l: 'Воровство',   v: 9,  c: 'hsl(var(--mc-redstone))' },
+      { emoji: '⚡', l: 'Читы / X-Ray',       v: 48, c: 'hsl(var(--mc-diamond))'  },
+      { emoji: '💬', l: 'Оскорбления',         v: 31, c: 'hsl(var(--mc-gold))'     },
+      { emoji: '🤝', l: 'Тим с читером',       v: 13, c: 'hsl(var(--mc-redstone))' },
+      { emoji: '🛡️', l: 'Оскорб. администрации', v: 8, c: 'hsl(var(--mc-sky))'    },
     ];
 
     return (
