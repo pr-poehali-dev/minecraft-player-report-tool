@@ -99,3 +99,129 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ===== BRUSH SMP — Minecraft theme ===== */
+:root {
+  --mc-grass: 96 44% 43%;
+  --mc-grass-dark: 96 40% 30%;
+  --mc-dirt: 26 40% 32%;
+  --mc-dirt-dark: 26 42% 22%;
+  --mc-stone: 220 8% 42%;
+  --mc-stone-dark: 220 10% 26%;
+  --mc-sky: 205 60% 62%;
+  --mc-wood: 33 45% 55%;
+  --mc-gold: 45 90% 55%;
+  --mc-redstone: 0 70% 48%;
+  --mc-diamond: 180 62% 55%;
+}
+
+.mc-sky-bg {
+  background-color: hsl(205 65% 68%);
+  background-image: linear-gradient(
+    180deg,
+    hsl(205 70% 72%) 0%,
+    hsl(200 60% 60%) 100%
+  );
+}
+
+.mc-dirt-tex {
+  background-color: hsl(var(--mc-dirt));
+  background-image:
+    linear-gradient(45deg, hsl(var(--mc-dirt-dark)) 25%, transparent 25%),
+    linear-gradient(-45deg, hsl(var(--mc-dirt-dark)) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, hsl(var(--mc-dirt-dark)) 75%),
+    linear-gradient(-45deg, transparent 75%, hsl(var(--mc-dirt-dark)) 75%);
+  background-size: 24px 24px;
+  background-position:
+    0 0,
+    0 12px,
+    12px -12px,
+    -12px 0;
+}
+
+.mc-stone-tex {
+  background-color: hsl(var(--mc-stone));
+  background-image:
+    radial-gradient(hsl(var(--mc-stone-dark)) 2px, transparent 2px),
+    radial-gradient(hsl(var(--mc-stone-dark)) 2px, transparent 2px);
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    10px 10px;
+}
+
+.mc-block {
+  image-rendering: pixelated;
+  border: 4px solid hsl(var(--mc-dirt-dark));
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.28),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.32),
+    5px 5px 0 rgba(0, 0, 0, 0.35);
+}
+
+.mc-btn {
+  font-family: "VT323", monospace;
+  image-rendering: pixelated;
+  border: 3px solid hsl(var(--mc-grass-dark));
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.35),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.35),
+    3px 3px 0 rgba(0, 0, 0, 0.4);
+  transition:
+    transform 0.08s,
+    box-shadow 0.08s;
+}
+.mc-btn:hover {
+  filter: brightness(1.1);
+}
+.mc-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.25),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    1px 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.mc-panel {
+  border: 4px solid hsl(var(--mc-stone-dark));
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.12),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.4),
+    6px 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+.pixel-shadow {
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
+}
+
+.mc-input {
+  width: 100%;
+  font-family: "VT323", monospace;
+  font-size: 1.25rem;
+  color: white;
+  padding: 0.6rem 0.8rem;
+  background: hsl(220 12% 18%);
+  border: 3px solid hsl(var(--mc-stone-dark));
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.5);
+  outline: none;
+}
+.mc-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+.mc-input:focus {
+  border-color: hsl(var(--mc-grass));
+}
+.mc-input option {
+  background: hsl(220 12% 18%);
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--mc-stone-dark));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--mc-grass));
+  border: 2px solid hsl(var(--mc-grass-dark));
+}
