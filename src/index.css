@@ -247,3 +247,158 @@ select,
 [role="button"] {
   cursor: var(--sword-cursor);
 }
+
+/* ═══════════════════════════════════════
+   SIDEBAR & NAVIGATION
+═══════════════════════════════════════ */
+.mc-sidebar {
+  background: hsl(220 14% 14%);
+  background-image:
+    radial-gradient(hsl(220 14% 11%) 1px, transparent 1px),
+    radial-gradient(hsl(220 14% 11%) 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-position:
+    0 0,
+    8px 8px;
+  border-right: 4px solid #000;
+}
+
+.mc-logo-block {
+  background: hsl(220 14% 18%);
+  border: 3px solid hsl(220 14% 10%);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.08),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Inventory slot */
+.mc-slot {
+  background: hsl(220 12% 20%);
+  border: 3px solid transparent;
+  border-top-color: hsl(220 10% 12%);
+  border-left-color: hsl(220 10% 12%);
+  border-right-color: hsl(220 14% 32%);
+  border-bottom-color: hsl(220 14% 32%);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.05);
+  image-rendering: pixelated;
+}
+
+.mc-slot-active {
+  background: hsl(220 14% 28%);
+  border-top-color: hsl(220 14% 32%);
+  border-left-color: hsl(220 14% 32%);
+  border-right-color: hsl(220 10% 12%);
+  border-bottom-color: hsl(220 10% 12%);
+  box-shadow:
+    inset -1px -1px 0 rgba(255, 255, 255, 0.08),
+    0 0 8px hsl(var(--mc-gold) / 0.4);
+}
+
+/* Nav item */
+.mc-nav-item {
+  border: 2px solid transparent;
+  transition:
+    background 0.1s,
+    border-color 0.1s;
+}
+.mc-nav-item:hover {
+  background: hsl(220 14% 20%);
+  border-color: hsl(var(--mc-stone-dark));
+}
+.mc-nav-active {
+  background: hsl(220 14% 22%);
+  border-color: hsl(var(--mc-gold) / 0.4);
+  box-shadow: 0 0 12px hsl(var(--mc-gold) / 0.15);
+}
+
+.mc-selected-bar {
+  box-shadow: 0 0 6px hsl(var(--mc-gold));
+}
+
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
+.mc-btn-green {
+  font-family: "VT323", monospace;
+  background: hsl(var(--mc-grass));
+  border: 3px solid hsl(var(--mc-grass-dark));
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.3),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    3px 3px 0 rgba(0, 0, 0, 0.4);
+  color: white;
+  transition:
+    filter 0.08s,
+    transform 0.08s,
+    box-shadow 0.08s;
+}
+.mc-btn-green:hover {
+  filter: brightness(1.15);
+}
+.mc-btn-green:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.mc-btn-gray {
+  font-family: "VT323", monospace;
+  background: hsl(var(--mc-stone));
+  border: 3px solid hsl(var(--mc-stone-dark));
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.2),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    3px 3px 0 rgba(0, 0, 0, 0.4);
+  color: white;
+  transition:
+    filter 0.08s,
+    transform 0.08s,
+    box-shadow 0.08s;
+}
+.mc-btn-gray:hover {
+  filter: brightness(1.15);
+}
+.mc-btn-gray:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ═══════════════════════════════════════
+   FILTER TABS
+═══════════════════════════════════════ */
+.mc-tab {
+  font-family: "VT323", monospace;
+  background: hsl(220 12% 20%);
+  border: 2px solid hsl(220 10% 12%);
+  color: rgba(255, 255, 255, 0.7);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+  transition: all 0.1s;
+}
+.mc-tab:hover {
+  background: hsl(220 12% 26%);
+  color: white;
+}
+.mc-tab-active {
+  background: hsl(var(--mc-grass));
+  border-color: hsl(var(--mc-grass-dark));
+  color: white;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.3),
+    2px 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ═══════════════════════════════════════
+   BADGES
+═══════════════════════════════════════ */
+.mc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 2px solid rgba(0, 0, 0, 0.4);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.2),
+    2px 2px 0 rgba(0, 0, 0, 0.3);
+  color: white;
+  font-family: "VT323", monospace;
+  white-space: nowrap;
+}
