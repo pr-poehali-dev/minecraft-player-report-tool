@@ -661,27 +661,7 @@ export default function Index() {
           </div>
         </div>
 
-        {/* Top violators */}
-        <div className="mc-panel mc-stone-tex p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <TNT size={24} />
-            <span className="font-pixel text-[10px] text-[hsl(var(--mc-gold))] pixel-shadow">ТОП НАРУШИТЕЛЕЙ</span>
-          </div>
-          <div className="space-y-2">
-            {[
-              { rank: '🥇', name: 'GrieferKing',   count: 8, banned: true },
-              { rank: '🥈', name: 'ToxicPlayer99', count: 5, banned: false },
-              { rank: '🥉', name: 'HackerXD',      count: 3, banned: true },
-            ].map((p, i) => (
-              <div key={i} className="mc-block bg-black/20 px-3 py-2 flex items-center gap-3">
-                <span className="text-xl">{p.rank}</span>
-                <span className="font-mono text-base text-[hsl(var(--mc-gold))] flex-1">{p.name}</span>
-                <span className="font-mono text-sm text-white/60">{p.count} репортов</span>
-                {p.banned && <span className="mc-badge bg-[hsl(var(--mc-redstone))] text-xs">🔨 БАН</span>}
-              </div>
-            ))}
-          </div>
-        </div>
+
       </div>
     );
   }
