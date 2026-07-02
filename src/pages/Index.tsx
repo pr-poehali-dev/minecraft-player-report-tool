@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import Icon from '@/components/ui/icon';
+import { useState, useEffect, useCallback } from 'react';
+
+const API = 'https://functions.poehali.dev/c42fef9b-974c-48d7-aea8-696864982499';
 
 const HERO_BG =
   'https://cdn.poehali.dev/projects/c933e68b-9249-4b08-90e2-22d31d44feb9/files/36d41d2a-dfc9-465c-8c32-f08867058dad.jpg';
@@ -26,12 +27,7 @@ const NAV = [
   { id: 'stats',   label: 'Статистика',  emoji: '📊', icon: 'BarChart3' },
 ];
 
-const REPORTS: Report[] = [
-  { id: 1042, target: 'GrieferKing',  author: 'Steve_Miner', reason: 'Разрушение построек / гриферство', date: '02.07.2026', status: 'new',    hasProof: true,  emoji: '💣' },
-  { id: 1041, target: 'ToxicPlayer99',author: 'AlexBuild',   reason: 'Оскорбления в чате',               date: '01.07.2026', status: 'review', hasProof: true,  emoji: '💬' },
-  { id: 1040, target: 'HackerXD',     author: 'RedstoneGod', reason: 'Использование читов (fly/kill aura)',date: '30.06.2026', status: 'closed', hasProof: true,  emoji: '⚡' },
-  { id: 1039, target: 'ThiefBoy',     author: 'Notch_Fan',   reason: 'Воровство из сундуков',            date: '29.06.2026', status: 'closed', hasProof: false, emoji: '🗝️' },
-];
+
 
 const STATUS_META: Record<Status, { label: string; color: string; icon: string; emoji: string }> = {
   new:    { label: 'НОВЫЙ',           color: 'hsl(var(--mc-redstone))', icon: 'Zap',          emoji: '🔴' },
@@ -140,9 +136,15 @@ export default function Index() {
   const [tab, setTab] = useState('home');
   const [files, setFiles] = useState<File[]>([]);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [myNick, setMyNick] = useState(() => localStorage.getItem('brushNick') || '');
 
   const onFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setFiles(Array.from(e.target.files));
+  };
+
+  const saveNick = (nick: string) => {
+    setMyNick(nick);
+    localStorage.setItem('brushNick', nick);
   };
 
   return (
@@ -250,8 +252,8 @@ export default function Index() {
             {tab === 'home'    && <Home setTab={setTab} />}
             {tab === 'rules'   && <Rules />}
             {tab === 'reports' && <ReportsList />}
-            {tab === 'new'     && <NewReport files={files} onFiles={onFiles} />}
-            {tab === 'my'      && <MyReports />}
+            {tab === 'new'     && <NewReport files={files} onFiles={onFiles} myNick={myNick} onSuccess={() => setTab('my')} />}
+            {tab === 'my'      && <MyReports myNick={myNick} saveNick={saveNick} />}
             {tab === 'stats'   && <Stats />}
           </div>
         </main>
@@ -327,22 +329,41 @@ export default function Index() {
         </section>
 
         {/* Latest reports preview */}
-        <section>
-          <div className="flex items-center gap-2 mb-3">
-            <TNT size={20} />
-            <h2 className="font-pixel text-xs text-white/60 tracking-widest">ПОСЛЕДНИЕ РЕПОРТЫ</h2>
-          </div>
-          <div className="space-y-2">
-            {REPORTS.slice(0, 2).map((r, i) => (
-              <MiniReportCard key={r.id} r={r} delay={i * 0.05} />
-            ))}
-          </div>
-          <button onClick={() => setTab('reports')}
-            className="mc-btn-gray w-full mt-3 py-2 font-mono text-lg flex items-center justify-center gap-2">
-            ⚠️ Все репорты →
-          </button>
-        </section>
+        <LatestReports setTab={setTab} />
       </div>
+    );
+  }
+
+  function LatestReports({ setTab }: { setTab: (t: string) => void }) {
+    const [reports, setReports] = useState<Report[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      fetch(API)
+        .then(r => r.json())
+        .then(d => setReports((d.reports || []).slice(0, 2)))
+        .finally(() => setLoading(false));
+    }, []);
+
+    return (
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <TNT size={20} />
+          <h2 className="font-pixel text-xs text-white/60 tracking-widest">ПОСЛЕДНИЕ РЕПОРТЫ</h2>
+        </div>
+        {loading ? <Loader /> : (
+          <div className="space-y-2">
+            {reports.length === 0 && (
+              <div className="mc-panel bg-black/20 p-4 font-mono text-base text-white/50 text-center">Репортов пока нет</div>
+            )}
+            {reports.map((r, i) => <MiniReportCard key={r.id} r={r} delay={i * 0.05} />)}
+          </div>
+        )}
+        <button onClick={() => setTab('reports')}
+          className="mc-btn-gray w-full mt-3 py-2 font-mono text-lg flex items-center justify-center gap-2">
+          ⚠️ Все репорты →
+        </button>
+      </section>
     );
   }
 
@@ -406,33 +427,47 @@ export default function Index() {
   ════════════════════════════════════ */
   function ReportsList() {
     const [filter, setFilter] = useState<Status | 'all'>('all');
-    const filtered = filter === 'all' ? REPORTS : REPORTS.filter(r => r.status === filter);
+    const [reports, setReports] = useState<Report[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const load = useCallback(() => {
+      setLoading(true);
+      fetch(API)
+        .then(r => r.json())
+        .then(d => setReports(d.reports || []))
+        .finally(() => setLoading(false));
+    }, []);
+
+    useEffect(() => { load(); }, [load]);
+
+    const filtered = filter === 'all' ? reports : reports.filter(r => r.status === filter);
 
     return (
       <div className="animate-fade-in">
         <SectionTitle emoji="⚠️" title="ВСЕ РЕПОРТЫ" sub="Жалобы на нарушителей сервера" />
 
-        {/* Filter bar — inventory tabs style */}
-        <div className="flex gap-2 mb-4 flex-wrap">
+        <div className="flex gap-2 mb-4 flex-wrap items-center">
           {([['all','🗂️','Все'], ['new','🔴','Новые'], ['review','🟡','В работе'], ['closed','🟢','Закрытые']] as const).map(([val, emoji, label]) => (
             <button key={val} onClick={() => setFilter(val as Status | 'all')}
               className={`mc-tab flex items-center gap-1.5 px-3 py-1.5 font-mono text-base ${filter === val ? 'mc-tab-active' : ''}`}>
               {emoji} {label}
             </button>
           ))}
+          <button onClick={load} className="ml-auto mc-tab px-3 py-1.5 font-mono text-base">🔄</button>
         </div>
 
-        <div className="space-y-3">
-          {filtered.map((r, i) => (
-            <ReportCard key={r.id} r={r} delay={i * 0.06} />
-          ))}
-        </div>
-
-        {filtered.length === 0 && (
-          <div className="mc-panel mc-stone-tex p-10 text-center">
-            <div className="text-5xl mb-3">🗂️</div>
-            <div className="font-mono text-xl text-white/60">Репортов в этом статусе нет</div>
-          </div>
+        {loading ? <Loader /> : (
+          <>
+            <div className="space-y-3">
+              {filtered.map((r, i) => <ReportCard key={r.id} r={r} delay={i * 0.06} />)}
+            </div>
+            {filtered.length === 0 && (
+              <div className="mc-panel mc-stone-tex p-10 text-center">
+                <div className="text-5xl mb-3">🗂️</div>
+                <div className="font-mono text-xl text-white/60">Репортов пока нет</div>
+              </div>
+            )}
+          </>
         )}
       </div>
     );
@@ -493,12 +528,63 @@ export default function Index() {
   /* ════════════════════════════════════
      NEW REPORT
   ════════════════════════════════════ */
-  function NewReport({ files, onFiles }: { files: File[]; onFiles: (e: React.ChangeEvent<HTMLInputElement>) => void }) {
+  function NewReport({ files, onFiles, myNick, onSuccess }: {
+    files: File[];
+    onFiles: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    myNick: string;
+    onSuccess: () => void;
+  }) {
+    const [target, setTarget] = useState('');
+    const [author, setAuthor] = useState(myNick);
+    const [vtype, setVtype] = useState('Гриферство');
+    const [desc, setDesc] = useState('');
+    const [sending, setSending] = useState(false);
+    const [done, setDone] = useState(false);
+    const [error, setError] = useState('');
+
+    const TYPES = ['Гриферство','Читы / хаки','Оскорбления','Воровство','Тим с читером (софт)','X-Ray / Block ESP','Оскорбление администрации','Оскорбление родителей','Другое'];
+
+    const submit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setError('');
+      if (!target.trim() || !author.trim() || !desc.trim()) {
+        setError('Заполни все поля!');
+        return;
+      }
+      setSending(true);
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ target: target.trim(), author: author.trim(), violation_type: vtype, description: desc.trim() }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          saveNick(author.trim());
+          setDone(true);
+          setTimeout(() => { setDone(false); onSuccess(); }, 1800);
+        } else {
+          setError(data.error || 'Ошибка отправки');
+        }
+      } catch {
+        setError('Нет соединения с сервером');
+      } finally {
+        setSending(false);
+      }
+    };
+
+    if (done) return (
+      <div className="animate-pop-in flex flex-col items-center justify-center py-20 gap-4">
+        <div className="text-6xl animate-float">✅</div>
+        <div className="font-pixel text-sm text-[hsl(var(--mc-gold))] pixel-shadow text-center">РЕПОРТ ОТПРАВЛЕН!</div>
+        <div className="font-mono text-lg text-white/70">Перенаправляем в «Мои репорты»...</div>
+      </div>
+    );
+
     return (
       <div className="animate-fade-in max-w-2xl mx-auto">
         <SectionTitle emoji="✍️" title="НОВЫЙ РЕПОРТ" sub="Опиши нарушение и приложи доказательства" />
 
-        {/* Crafting table style header */}
         <div className="mc-panel mc-dirt-tex p-4 mb-4 flex items-center gap-4">
           <TNT size={40} />
           <div className="font-mono text-base text-white/80">
@@ -507,43 +593,33 @@ export default function Index() {
           </div>
         </div>
 
-        <form className="mc-panel mc-stone-tex p-5 space-y-4" onSubmit={(e) => e.preventDefault()}>
+        <form className="mc-panel mc-stone-tex p-5 space-y-4" onSubmit={submit}>
           <Field label="Ник нарушителя" emoji="🎯">
-            <input className="mc-input" placeholder="Например: GrieferKing" />
+            <input className="mc-input" placeholder="Например: GrieferKing" value={target} onChange={e => setTarget(e.target.value)} />
           </Field>
           <Field label="Твой ник" emoji="👤">
-            <input className="mc-input" placeholder="Твой ник на сервере" />
+            <input className="mc-input" placeholder="Твой ник на сервере" value={author} onChange={e => setAuthor(e.target.value)} />
           </Field>
           <Field label="Тип нарушения" emoji="⚠️">
-            <select className="mc-input">
-              <option>💣 Гриферство</option>
-              <option>⚡ Читы / хаки</option>
-              <option>💬 Оскорбления</option>
-              <option>🗝️ Воровство</option>
-              <option>🔧 Другое</option>
+            <select className="mc-input" value={vtype} onChange={e => setVtype(e.target.value)}>
+              {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </Field>
           <Field label="Описание произошедшего" emoji="📝">
             <textarea className="mc-input min-h-28 resize-none"
-              placeholder="Опиши, что произошло, когда и где на сервере..." />
+              placeholder="Опиши, что произошло, когда и где на сервере..."
+              value={desc} onChange={e => setDesc(e.target.value)} />
           </Field>
 
           <Field label="Доказательства" emoji="📎">
             <label className="block mc-panel bg-black/20 p-6 text-center hover:bg-black/30 transition group">
               <div className="flex justify-center gap-3 mb-3">
-                <DiamondSword size={32} />
-                <Chest size={32} />
-                <Shield size={32} />
+                <DiamondSword size={32} /><Chest size={32} /><Shield size={32} />
               </div>
-              <div className="font-mono text-xl text-white group-hover:text-[hsl(var(--mc-gold))] transition">
-                Перетащи или выбери файлы
-              </div>
-              <div className="font-mono text-sm text-white/50 mt-1">
-                Скриншоты · Видео · .txt логи
-              </div>
+              <div className="font-mono text-xl text-white group-hover:text-[hsl(var(--mc-gold))] transition">Перетащи или выбери файлы</div>
+              <div className="font-mono text-sm text-white/50 mt-1">Скриншоты · Видео · .txt логи</div>
               <input type="file" multiple accept="image/*,video/*,.txt,.log" className="hidden" onChange={onFiles} />
             </label>
-
             {files.length > 0 && (
               <div className="mt-3 space-y-2">
                 {files.map((f, i) => (
@@ -557,9 +633,15 @@ export default function Index() {
             )}
           </Field>
 
-          <button type="submit"
-            className="mc-btn-green w-full py-4 font-mono text-2xl flex items-center justify-center gap-2">
-            ⚔️ Отправить репорт
+          {error && (
+            <div className="mc-block bg-[hsl(var(--mc-redstone))] px-4 py-2 font-mono text-base text-white">
+              ⚠️ {error}
+            </div>
+          )}
+
+          <button type="submit" disabled={sending}
+            className="mc-btn-green w-full py-4 font-mono text-2xl flex items-center justify-center gap-2 disabled:opacity-60">
+            {sending ? '⏳ Отправка...' : '⚔️ Отправить репорт'}
           </button>
         </form>
       </div>
@@ -580,30 +662,62 @@ export default function Index() {
   /* ════════════════════════════════════
      MY REPORTS
   ════════════════════════════════════ */
-  function MyReports() {
-    const mine = REPORTS.slice(0, 2);
+  function MyReports({ myNick, saveNick }: { myNick: string; saveNick: (n: string) => void }) {
+    const [reports, setReports] = useState<Report[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [nickInput, setNickInput] = useState(myNick);
+
+    const load = useCallback((nick: string) => {
+      if (!nick.trim()) return;
+      setLoading(true);
+      fetch(`${API}?author=${encodeURIComponent(nick.trim())}`)
+        .then(r => r.json())
+        .then(d => setReports(d.reports || []))
+        .finally(() => setLoading(false));
+    }, []);
+
+    useEffect(() => { if (myNick) load(myNick); }, [myNick, load]);
+
+    const handleSearch = (e: React.FormEvent) => {
+      e.preventDefault();
+      saveNick(nickInput);
+      load(nickInput);
+    };
+
     return (
       <div className="animate-fade-in">
         <SectionTitle emoji="🎒" title="МОИ РЕПОРТЫ" sub="Жалобы, которые ты подал" />
 
-        {/* Player card */}
-        <div className="mc-panel mc-dirt-tex p-4 mb-5 flex items-center gap-4">
-          <div className="mc-slot w-16 h-16 flex items-center justify-center text-4xl">🧑‍🦱</div>
-          <div>
-            <div className="font-mono text-2xl text-[hsl(var(--mc-gold))]">Steve_Miner</div>
-            <div className="font-mono text-base text-white/60">Подано: {mine.length} · Подтверждено: 1</div>
-            <div className="flex items-center gap-1 mt-1">
-              {[...Array(5)].map((_, i) => (
-                <span key={i} className="text-base">{i < 3 ? '❤️' : '🖤'}</span>
-              ))}
-              <span className="font-mono text-sm text-white/50 ml-2">репутация игрока</span>
+        <form className="mc-panel mc-dirt-tex p-4 mb-5 flex gap-3 items-end" onSubmit={handleSearch}>
+          <div className="flex-1">
+            <label className="font-mono text-lg text-[hsl(var(--mc-gold))] block mb-1">👤 Твой ник на сервере</label>
+            <input className="mc-input" placeholder="Введи ник и нажми найти"
+              value={nickInput} onChange={e => setNickInput(e.target.value)} />
+          </div>
+          <button type="submit" className="mc-btn-green px-5 py-2 font-mono text-xl shrink-0">🔍 Найти</button>
+        </form>
+
+        {myNick && (
+          <div className="mc-panel mc-stone-tex p-4 mb-4 flex items-center gap-4">
+            <div className="mc-slot w-14 h-14 flex items-center justify-center text-3xl">🧑‍🦱</div>
+            <div>
+              <div className="font-mono text-2xl text-[hsl(var(--mc-gold))]">{myNick}</div>
+              <div className="font-mono text-base text-white/60">Подано репортов: {reports.length}</div>
             </div>
           </div>
-        </div>
+        )}
 
-        <div className="space-y-3">
-          {mine.map((r, i) => <ReportCard key={r.id} r={r} delay={i * 0.06} />)}
-        </div>
+        {loading ? <Loader /> : (
+          <div className="space-y-3">
+            {reports.length === 0 && myNick && (
+              <div className="mc-panel mc-stone-tex p-10 text-center">
+                <div className="text-5xl mb-3">🎒</div>
+                <div className="font-mono text-xl text-white/60">Репортов от «{myNick}» не найдено</div>
+              </div>
+            )}
+            {reports.map((r, i) => <ReportCard key={r.id} r={r} delay={i * 0.06} />)}
+          </div>
+        )}
       </div>
     );
   }
@@ -666,6 +780,15 @@ export default function Index() {
   /* ════════════════════════════════════
      SHARED
   ════════════════════════════════════ */
+  function Loader() {
+    return (
+      <div className="mc-panel mc-stone-tex p-8 text-center animate-fade-in">
+        <div className="text-4xl animate-float mb-2">⛏️</div>
+        <div className="font-mono text-lg text-white/60">Загружаем данные...</div>
+      </div>
+    );
+  }
+
   function SectionTitle({ emoji, title, sub }: { emoji: string; title: string; sub: string }) {
     return (
       <div className="flex items-center gap-4 mb-5">

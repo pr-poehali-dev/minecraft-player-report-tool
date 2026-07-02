@@ -1,0 +1,26 @@
+{
+  "tests": [
+    {
+      "name": "GET all reports",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {"reports": []},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "POST create report",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "author": "TestPlayer",
+        "target": "BadGuy",
+        "violation_type": "Гриферство",
+        "description": "Сломал мой дом"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {"ok": true},
+      "bodyMatcher": "partial"
+    }
+  ]
+}
