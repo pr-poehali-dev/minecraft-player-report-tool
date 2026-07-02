@@ -377,24 +377,21 @@ export default function Index() {
         </div>
 
         {/* Penalty table */}
-        <div className="mc-panel mc-dirt-tex p-4 mt-4">
+        <div className="mc-panel mc-dirt-tex p-4 mt-2">
           <div className="flex items-center gap-2 mb-3">
             <Chest size={24} />
             <span className="font-pixel text-[10px] text-[hsl(var(--mc-gold))] pixel-shadow">ТАБЛИЦА НАКАЗАНИЙ</span>
           </div>
           <div className="space-y-2">
             {[
-              { v: 'Тим с читером (софт)',     p: 'Бан по IP на 3–7 дней',     e: '🤝' },
-              { v: 'X-Ray / Block ESP',        p: 'Бан по IP на 14 дней',      e: '👁️' },
-              { v: 'Оскорбление администрации',p: 'Мут на 1 час',              e: '🛡️' },
-              { v: 'Оскорбление родителей',    p: 'Бан на 1 день',             e: '🤬' },
-              { v: '1-е нарушение (прочее)',   p: 'Предупреждение / мут 24ч', e: '⚠️' },
-              { v: '2-е нарушение',            p: 'Временный бан 3–7 дней',   e: '🔨' },
-              { v: '3-е нарушение',            p: 'Перманентный бан',         e: '💀' },
+              { v: 'Тим с читером (софт)',      p: 'Бан по IP на 3–7 дней', e: '🤝' },
+              { v: 'X-Ray / Block ESP',          p: 'Бан по IP на 14 дней',  e: '👁️' },
+              { v: 'Оскорбление администрации',  p: 'Мут на 1 час',          e: '🛡️' },
+              { v: 'Оскорбление родителей',      p: 'Бан на 1 день',         e: '🤬' },
             ].map((row, i) => (
               <div key={i} className="flex items-center gap-3 mc-block bg-black/20 px-3 py-2">
                 <span className="text-xl">{row.e}</span>
-                <span className="font-mono text-base text-white/70 w-36 shrink-0">{row.v}</span>
+                <span className="font-mono text-base text-white/70 w-44 shrink-0">{row.v}</span>
                 <span className="font-mono text-base text-white">{row.p}</span>
               </div>
             ))}
